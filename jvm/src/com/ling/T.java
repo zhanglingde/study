@@ -6,6 +6,6 @@ package com.ling;
  */
 public class T {
     public static void main(String[] args) {
-        new T()
+        new T();
     }
 }
