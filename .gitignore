@@ -6,6 +6,7 @@ study.iml
 
 
 jvm/jvm.iml
+zookeeper/.idea
 zookeeper/zookeeper.iml
 
 
