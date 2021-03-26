@@ -1,10 +1,10 @@
 .idea
 .mvn
 target
-community.iml
-out
+study.iml
 
-jvm/out
+
+
 jvm/jvm.iml
 
 
