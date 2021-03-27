@@ -1,4 +1,4 @@
-package org.example;
+package com.ling.zookeeper;
 
 import static org.junit.Assert.assertTrue;
 
