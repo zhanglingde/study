@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.concurrent.CountDownLatch;
 
 /**
+ * 连接zookeeper工具类
  * @author zhangling  2021/3/27 16:37
  */
 public class ZKUtils {
@@ -13,8 +14,8 @@ public class ZKUtils {
     private static ZooKeeper zk;
 
     // 以testConf为当前Client连接的根目录,可能多个项目公用一个zookeeper，所以不同的服务在不同的目录下工作
-    // private static String address = "192.168.191.128:2181,192.168.191.129:2181,192.168.191.130:2181,192.168.191.132:2181/testConf";
-    private static String address = "192.168.164.132:2181,192.168.164.133:2181,192.168.164.134:2181,192.168.164.135:2181/testConf";
+     private static String address = "192.168.191.128:2181,192.168.191.129:2181,192.168.191.130:2181,192.168.191.132:2181/testLock";
+    //private static String address = "192.168.164.132:2181,192.168.164.133:2181,192.168.164.134:2181,192.168.164.135:2181/testConf";
 
     /**
      * 默认new Zookeeper时注册的Watch

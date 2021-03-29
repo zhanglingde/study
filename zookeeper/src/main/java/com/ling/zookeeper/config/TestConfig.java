@@ -10,6 +10,7 @@ import org.junit.Before;
 import org.junit.Test;
 
 /**
+ * 测试类
  * @author zhangling  2021/3/27 16:59
  */
 public class TestConfig {
@@ -37,6 +38,7 @@ public class TestConfig {
         watchCallBack.setZk(zooKeeper);
         MyConf myConf = new MyConf();
         watchCallBack.setConf(myConf);
+
 
         watchCallBack.aWait();
         // 1.节点不存在

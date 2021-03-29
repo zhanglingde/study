@@ -6,6 +6,9 @@ import org.apache.zookeeper.Watcher;
 import java.util.concurrent.CountDownLatch;
 
 /**
+ * 默认new Zookeeper时注册的Watch
+ * 当监控到zookeeper连接成功后，放开阻塞
+ *
  * @author zhangling  2021/3/27 16:54
  */
 public class DefaultWatch implements Watcher {
