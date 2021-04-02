@@ -28,6 +28,7 @@ public class GeneratorCodeService {
 
     // 加载 Freemarker模板
     Configuration config = null;
+
     {
         config = new Configuration(Configuration.VERSION_2_3_31);
         config.setTemplateLoader(new ClassTemplateLoader(GeneratorCodeService.class, "/templates"));
@@ -35,14 +36,18 @@ public class GeneratorCodeService {
     }
 
     /**
-     *
      * @param tableClasses
-     * @param realPath 根路径
+     * @param realPath     根路径
      * @return
      */
     public RespBean generatorCode(List<TableClass> tableClasses, String realPath) {
         try {
             Template modelTemplate = config.getTemplate("Model.java.ftl");
+            Template controllerTemplate = config.getTemplate("Controller.java.ftl");
+            Template serviceTemplate = config.getTemplate("Service.java.ftl");
+            Template mapperJavaTemplate = config.getTemplate("Mapper.java.ftl");
+            Template mapperXmlTemplate = config.getTemplate("Mapper.xml.ftl");
+
             Connection connection = DbUtils.getConnection();
             DatabaseMetaData metaData = connection.getMetaData();
             for (TableClass tableClass : tableClasses) {
@@ -58,7 +63,7 @@ public class GeneratorCodeService {
                     columnClass.setType(type_name);
                     columnClass.setRemark(remarks);
                     // 转换成陀峰
-                    columnClass.setPropertyName(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL,column_name));
+                    columnClass.setPropertyName(CaseFormat.LOWER_UNDERSCORE.to(CaseFormat.UPPER_CAMEL, column_name));
 
                     // 遍历一次后需要移动指针到首位置
                     primaryKeys.first();
@@ -73,10 +78,15 @@ public class GeneratorCodeService {
                 tableClass.setColumns(columnClassList);
 
                 // 生成代码
-                String path = realPath + "/"+tableClass.getPackageName().replace(".","/");
-                generate(modelTemplate,tableClass,path+"/model/");
+                //String path = realPath + "/"+tableClass.getPackageName().replace(".","/");     // 临时文件夹路径
+                String path = GeneratorCodeService.class.getResource("/").getPath() + tableClass.getPackageName().replace(".", "/");
+                generate(modelTemplate, tableClass, path + "/model/");
+                generate(controllerTemplate, tableClass, path + "/controller/");
+                generate(serviceTemplate, tableClass, path + "/service/");
+                generate(mapperJavaTemplate, tableClass, path + "/mapper/");
+                generate(mapperXmlTemplate, tableClass, path + "/mapper/");
             }
-            return RespBean.ok("代码已生成",realPath);
+            return RespBean.ok("代码已生成", realPath);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -84,16 +94,25 @@ public class GeneratorCodeService {
         return RespBean.error("代码生成失败");
     }
 
+    /**
+     * 根据模板生成代码
+     *
+     * @param template   Freemarker生成的模板
+     * @param tableClass 需要生成模板的数据库表
+     * @param path       存放生成代码路径
+     * @throws IOException
+     * @throws TemplateException
+     */
     private void generate(Template template, TableClass tableClass, String path) throws IOException, TemplateException {
         File folder = new File(path);
         if (!folder.exists()) {
             folder.mkdirs();
         }
 
-        String fileName = path+"/"+tableClass.getModelName()+template.getName().replace(".ftl","").replace("Model","");
+        String fileName = path + "/" + tableClass.getModelName() + template.getName().replace(".ftl", "").replace("Model", "");
         FileOutputStream fos = new FileOutputStream(fileName);
         OutputStreamWriter out = new OutputStreamWriter(fos);
-        template.process(tableClass,out);
+        template.process(tableClass, out);
         fos.close();
         out.close();
 
