@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>代码生成器</title>
+
+    <!-- 开发环境版本，包含了有帮助的命令行警告 -->
+    <script src="https://cdn.jsdelivr.net/npm/vue/dist/vue.js"></script>
+    <!-- 引入样式 -->
+    <link rel="stylesheet" href="https://unpkg.com/element-ui/lib/theme-chalk/index.css">
+    <!-- 引入组件库 -->
+    <script src="https://unpkg.com/element-ui/lib/index.js"></script>
+
+    <script src="https://unpkg.com/axios/dist/axios.min.js"></script>
+
+</head>
+<body>
+<div id="app">
+    <table>
+        <tr>
+            <td>
+                <el-tag size="mini">数据库用户名：</el-tag>
+            </td>
+            <td>
+                <el-input size="mini" v-model="db.username"></el-input>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <el-tag size="mini">数据库密码：</el-tag>
+            </td>
+            <td>
+                <el-input size="mini" v-model="db.password"></el-input>
+            </td>
+        </tr>
+        <tr>
+            <td>
+                <el-tag size="mini">数据库连接地址：</el-tag>
+            </td>
+            <td>
+                <el-input size="mini" v-model="db.url">
+                    <!--  增加前缀和后缀  -->
+                    <template slot="prepend">jdbc:mysql://</template>
+                    <template slot="append">
+                        ?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai
+                    </template>
+                </el-input>
+            </td>
+        </tr>
+    </table>
+    <div style="display: flex">
+        <el-button type="primary" size="mini" @click="connect" :disabled="!connectBtnEnabled">连接数据库</el-button>
+        <div style="color: #ff0114;font-weight: bold">*{{msg}}*</div>
+        <el-input v-model="packageName" size="mini" style="width: 300px"></el-input>
+        <el-button type="primary" size="mini" @click="config">配置</el-button>
+    </div>
+    <el-table
+            :data="tableData"
+            stripe
+            border
+            style="width: 100%">
+        <el-table-column
+                prop="tableName"
+                label="表名称"
+                width="180">
+        </el-table-column>
+        <el-table-column
+                label="实体类名称"
+                width="180">
+            <template slot-scope="scope">
+                <el-input v-model="scope.row.modelName"></el-input>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="Mapper名称">
+            <template slot-scope="scope">
+                <el-input v-model="scope.row.mapperName"></el-input>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="Service名称">
+            <template slot-scope="scope">
+                <el-input v-model="scope.row.serviceName"></el-input>
+            </template>
+        </el-table-column>
+        <el-table-column
+                label="Controller名称">
+            <template slot-scope="scope">
+                <el-input v-model="scope.row.controllerName"></el-input>
+            </template>
+        </el-table-column>
+    </el-table>
+    <div>
+        <el-button @click="generateCode" type="success">生成代码</el-button>
+        <div style="color: #ff0114;font-weight: bold">*{{result}}*</div>
+        <div>{{codePath}}</div>
+    </div>
+</div>
+<script>
+    new Vue({
+        el: "#app",
+        data: function () {
+            return {
+                tableData:[],
+                packageName: "com.ling.generator",
+                msg: '数据库未连接',
+                connectBtnEnabled: true,
+                db: {
+                    username: "root",
+                    password: "root",
+                    url: "localhost:3306/test"
+                }
+            }
+        },
+        methods: {
+            generateCode() {
+                let _this = this;
+                axios.post('/generatorCode', this.tableData)
+                    .then(function (response) {
+
+                    })
+                    .catch(function (error) {           // 请求失败
+                        console.log(error);
+                    });
+            },
+            config() {
+                let _this = this;
+                axios.post('/config', {packageName:this.packageName})
+                    .then(function (response) {
+                        _this.msg = response.data.msg;
+                        _this.tableData = response.data.obj;
+                    })
+                    .catch(function (error) {           // 请求失败
+                        console.log(error);
+                    });
+            },
+            connect() {
+                let _this = this;
+                // 请求 参数
+                this.db.url = "jdbc:mysql://" + this.db.url + "?useUnicode=true&characterEncoding=UTF-8&serverTimezone=Asia/Shanghai";
+                axios.post('/connect', this.db)
+                    .then(function (response) {
+                        // 对db.url做了修改，请求成功后还原db.url
+                        _this.msg = response.data.msg;
+                        _this.db = {
+                            username: "root",
+                            password: "root",
+                            url: "localhost:3306/test"
+                        }
+                        _this.connectBtnEnabled=false; // 请求成功，按钮不可点击
+                    })
+                    .catch(function (error) {           // 请求失败
+                        console.log(error);
+                    });
+            }
+        }
+    })
+</script>
+</body>
+</html>

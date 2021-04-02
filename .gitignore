@@ -8,6 +8,10 @@ study.iml
 jvm/jvm.iml
 zookeeper/.idea
 zookeeper/zookeeper.iml
+generator/.mvn
+generator/generator.iml
+generator/mvnw
+generator/mvnw.cmd
 
 
 
