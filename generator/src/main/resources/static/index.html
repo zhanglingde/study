@@ -102,6 +102,8 @@
         data: function () {
             return {
                 tableData:[],
+                result:'waiting...',
+                codePath:'',
                 packageName: "com.ling.generator",
                 msg: '数据库未连接',
                 connectBtnEnabled: true,
@@ -115,9 +117,10 @@
         methods: {
             generateCode() {
                 let _this = this;
-                axios.post('/generatorCode', this.tableData)
+                axios.post('/generateCode', this.tableData)
                     .then(function (response) {
-
+                        _this.result = response.data.msg;
+                        _this.codePath = response.data.obj;
                     })
                     .catch(function (error) {           // 请求失败
                         console.log(error);
